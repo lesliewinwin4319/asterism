@@ -132,7 +132,7 @@ function requestCard(action) {
     const handoff = document.createElement("div");
     handoff.className = "codex-handoff";
     const hint = document.createElement("span");
-    hint.textContent = "Return to Codex and invoke";
+    hint.textContent = "Return to Codex. Asterism will frame the problem with you first, then continue:";
     const command = document.createElement("code");
     command.textContent = "$asterism 处理待办";
     handoff.append(hint, command);

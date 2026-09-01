@@ -91,8 +91,7 @@ H5 展示过程，不展示对话内容：
 ```text
 Define · In progress
 
-○ Understand request          Completed
-◉ Clarify goal               Waiting for user
+◉ Frame the problem           Waiting for user
 ○ Inspect constraints         Queued
 ○ Synthesize goal             Queued
 
@@ -100,6 +99,8 @@ Continue in Codex
 ```
 
 这里的步骤名由实际工作流产生，不固定 Agent 数量，也不显示“还有 3 个问题”等对话细节。
+
+`Frame the problem` 是例外：它是每个 Define run 固定的首个门禁，由 `socratic-asking` 驱动。用户确认问题框定（或明确要求跳过并记录未决假设）之前，后续步骤不得启动。具体问题、回答和候选框定仍只出现在 Codex。
 
 ### 4.4 Run/Agent 状态
 
@@ -215,4 +216,3 @@ draft → pending → claimed → completed
 - Codex 尚未处理：明确显示 `Waiting for Codex`，不伪装成运行中。
 - Agent 失败：保留已生成文件和运行记录，允许从失败节点重试。
 - 页面刷新或服务重启：从 `.asterism` 恢复，不依赖浏览器内存。
-

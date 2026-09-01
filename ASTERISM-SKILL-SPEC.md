@@ -41,7 +41,10 @@ policy:
 
 - 检查是否存在已保存 Request。
 - 创建 define run。
-- 按请求复杂度选择 `model-thinking`、`define-goal`、`grilling` 或其他适合的 Skill。
+- 首先完整读取并调用 `socratic-asking`，将原始 Request 视为待验证假设。
+- 在用户确认问题框定前，不调用其他 Skill、不启动分析、不派出 Agent，也不定义目标。
+- 用户明确要求跳过时，先说明并记录尚未解决的框定假设，再继续后续流程。
+- 问题框定门禁完成后，按请求复杂度选择 `model-thinking`、`define-goal`、`grilling` 或其他适合的 Skill。
 - 可以将独立、并行的分析拆给多个 Agent，但不为了展示而强制多 Agent。
 - 与用户的问答留在 Codex。
 - 通过 MCP 回报关键状态。
@@ -91,6 +94,8 @@ detect existing .asterism
 ## 4. Define 工作规范
 
 Define 的目的不是给出解决方案，而是形成足以指导 Solutions 的 Active Goal。
+
+每个新 Define run 的首个工作单元固定为 `socratic_problem_framing`。它通过 `socratic-asking` 在 Codex 中完成问题发现与框定；只有用户明确确认问题陈述，或明确要求跳过且未决假设已记录后，才可标记完成。该单元完成前，其余工作单元保持 `queued`。
 
 Ready for Solutions 至少满足：
 
@@ -156,4 +161,3 @@ asterism/
 ```
 
 `SKILL.md` 保持短小，只放触发、路由和硬约束；详细 schema 和模板放在 references，按需读取。
-

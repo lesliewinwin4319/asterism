@@ -145,6 +145,26 @@ try {
     arguments: {
       rootPath: projectRoot,
       runId,
+      unit: {
+        id: "socratic_problem_framing",
+        status: "running",
+        agentLabel: "socratic-asking"
+      }
+    }
+  });
+  await mcp.request("tools/call", {
+    name: "asterism_update_run",
+    arguments: {
+      rootPath: projectRoot,
+      runId,
+      unit: { id: "socratic_problem_framing", status: "completed" }
+    }
+  });
+  await mcp.request("tools/call", {
+    name: "asterism_update_run",
+    arguments: {
+      rootPath: projectRoot,
+      runId,
       unit: { id: "synthesize", status: "running", agentLabel: "Goal synthesis" }
     }
   });
@@ -188,6 +208,8 @@ try {
 
   const html = await (await fetch(service.url)).text();
   assert.match(html, /Project ID/);
+  assert.match(html, /Socratic framing/);
+  assert.match(html, /Skills \/ Agents/);
 
   process.stdout.write(`${JSON.stringify({
     ok: true,
@@ -201,7 +223,8 @@ try {
       "HTTP classification visible in MCP",
       "original file path and content preserved",
       "HTTP Request visible and claimable through MCP",
-      "tracked Define run and work unit",
+      "tracked Define run with mandatory Socratic framing gate",
+      "H5 explains the Define workflow before submission",
       "registered Define artifact becomes the unique Active Goal"
     ]
   }, null, 2)}\n`);

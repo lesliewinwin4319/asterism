@@ -20,7 +20,7 @@
 - `asterism_register_artifact(rootPath, stage, relativePath, title, version, runId, sourceItemIds, sourceGoalArtifactId?)`: Register an existing verified local artifact.
 - `asterism_set_active_goal(rootPath, artifactId)`: Atomically set one Define artifact as Active Goal.
 
-Use absolute `rootPath` values. Claim actions before creating runs. Register only files that already exist inside the bound project root. Update work units before moving a run to a terminal state. Complete the action only after the run and artifact state are consistent.
+Use absolute `rootPath` values. Claim actions before creating runs. Every new Define run automatically receives a first `socratic_problem_framing` unit; complete it only after the `socratic-asking` interview is confirmed or the user explicitly skips with the unresolved assumption recorded. Later Define units cannot start, the run cannot complete, and a Define artifact cannot be registered before this gate completes. Register only files that already exist inside the bound project root. Update work units before moving a run to a terminal state. Complete the action only after the run and artifact state are consistent.
 
 ## Local panel
 
