@@ -55,4 +55,4 @@ H5 面板（分类与进度可视化）
 
 ## 当前开发状态
 
-Milestone 0 本地骨架和 Milestone 1 Define 闭环已实现：H5 可保存 Request，Codex 可通过 MCP 领取 action、登记 Run/工作单元、调用适合的 Skill 和可选多 Agent，并将版本化 Define 文件登记为唯一 Active Goal。Solutions 与 Notion 内容同步仍未实现。验证范围见 [docs/MILESTONE-1-DEFINE.md](./docs/MILESTONE-1-DEFINE.md)。
+Milestone 0 本地骨架和 Milestone 1 Define 闭环已实现：H5 可保存 Request，Codex 可通过 MCP 领取 action，并先用 `socratic-asking` 与用户确认问题框定；门禁完成后才登记后续工作、调用其他 Skill 和可选多 Agent，最终将版本化 Define 文件登记为唯一 Active Goal。Solutions 与 Notion 内容同步仍未实现。验证范围见 [docs/MILESTONE-1-DEFINE.md](./docs/MILESTONE-1-DEFINE.md)。

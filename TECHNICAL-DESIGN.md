@@ -150,6 +150,8 @@ type Run = {
 
 `agentLabel` 是用于用户理解的显示名称，不承诺映射到 Codex 的内部 Agent ID。
 
+新建 `define` Run 时，服务端自动注入并置顶 `socratic_problem_framing` 工作单元，所有工作单元从 `queued` 开始。该单元完成前，服务端拒绝启动其他 Define 工作单元、登记 Define artifact 或将 Run 标记为 `completed`。是否已获得用户确认由执行 `socratic-asking` 的 Asterism 编排器负责；用户明确跳过时，编排器必须先把未决假设写入 Define handoff。
+
 ### 4.5 Artifact
 
 ```ts

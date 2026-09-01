@@ -102,6 +102,8 @@ Asterism 是全局安装、显式调用的 Skill。它不是每个项目中复�
 - `$asterism 生成 Solutions`：检查 Active Goal 后进入解决方案流程。
 - `$asterism 同步 Notion`：通过 Codex 可用的 Notion 能力读取页面，再将结果写回项目。
 
+每次 Define 都先由 `socratic-asking` 完成问题发现与框定。用户确认问题陈述之前，不进入目标定义、分析、方案或多 Agent 阶段；用户可明确要求跳过，但系统必须保留未解决的框定假设。
+
 ### 7.4 Define 最终产物
 
 MVP 推荐使用一个 Markdown 目标定义文件，至少包含：
@@ -180,4 +182,3 @@ Solutions 可以是一份或多份文件，不强制统一正文结构。每次�
 - H5 通过显式刷新或短轮询获得状态；不要求 WebSocket。
 - “打开面板”在不同 Codex 运行环境下可能需要返回本地 URL，而不一定能自动打开浏览器。
 - Codex 多 Agent 的完整运行时状态未必有公开事件接口，因此 MVP 由 Asterism 工作流主动回报状态。
-

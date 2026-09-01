@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { initializeProject, listBoard } from "../src/domain/project-service.mjs";
 import {
+  DEFINE_FRAMING_UNIT_ID,
   cancelAction,
   claimAction,
   completeAction,
@@ -64,6 +65,28 @@ test("Define request flows through claim, tracked work, artifact, and Active Goa
     ]
   });
   const runId = createdRun.run.id;
+  assert.equal(createdRun.run.units[0].id, DEFINE_FRAMING_UNIT_ID);
+  await updateRun(rootPath, runId, { status: "running" });
+  await assert.rejects(
+    () => updateRun(rootPath, runId, {
+      unit: { id: "understand", status: "running", agentLabel: "Analysis" }
+    }),
+    { code: "PROBLEM_FRAMING_REQUIRED" }
+  );
+  await assert.rejects(
+    () => updateRun(rootPath, runId, { status: "completed" }),
+    { code: "PROBLEM_FRAMING_REQUIRED" }
+  );
+  await updateRun(rootPath, runId, {
+    unit: { id: DEFINE_FRAMING_UNIT_ID, status: "running" }
+  });
+  await updateRun(rootPath, runId, {
+    unit: { id: DEFINE_FRAMING_UNIT_ID, status: "waiting_user" }
+  });
+  await updateRun(rootPath, runId, { status: "waiting_user" });
+  await updateRun(rootPath, runId, {
+    unit: { id: DEFINE_FRAMING_UNIT_ID, status: "completed" }
+  });
   await updateRun(rootPath, runId, { status: "running" });
   await updateRun(rootPath, runId, { unit: { id: "understand", status: "running", agentLabel: "Analysis" } });
   await updateRun(rootPath, runId, { unit: { id: "understand", status: "completed" } });
@@ -110,6 +133,8 @@ test("artifact registration rejects missing files and paths outside the stage fo
     inputItemIds: []
   });
 
+  assert.equal(run.run.units[0].id, DEFINE_FRAMING_UNIT_ID);
+
   await assert.rejects(() => registerArtifact(rootPath, {
     stage: "define",
     relativePath: "asterism/solutions/wrong.md",
@@ -126,4 +151,39 @@ test("artifact registration rejects missing files and paths outside the stage fo
     runId: run.run.id,
     sourceItemIds: []
   }), { code: "FILE_NOT_FOUND" });
+});
+
+test("new Define runs cannot bypass the Socratic gate with pre-completed units", async (t) => {
+  const rootPath = await fixture(t);
+  const request = await createRequest(rootPath, "Jump straight to a solution");
+  await claimAction(rootPath, request.action.id);
+  const created = await createRun(rootPath, {
+    actionId: request.action.id,
+    stage: "define",
+    title: "Define safely",
+    inputItemIds: [],
+    units: [
+      { id: "analysis", label: "Analyze", status: "running" },
+      { id: DEFINE_FRAMING_UNIT_ID, label: "Bypass", status: "completed" }
+    ]
+  });
+
+  assert.deepEqual(
+    created.run.units.map(({ id, status }) => ({ id, status })),
+    [
+      { id: DEFINE_FRAMING_UNIT_ID, status: "queued" },
+      { id: "analysis", status: "queued" }
+    ]
+  );
+
+  const artifactRelativePath = "asterism/define/unframed-v1.md";
+  await writeFile(join(rootPath, artifactRelativePath), "# Unframed\n");
+  await assert.rejects(() => registerArtifact(rootPath, {
+    stage: "define",
+    relativePath: artifactRelativePath,
+    title: "Unframed",
+    version: 1,
+    runId: created.run.id,
+    sourceItemIds: []
+  }), { code: "PROBLEM_FRAMING_REQUIRED" });
 });

@@ -18,6 +18,13 @@ const WORK_STATUSES = new Set([
   "cancelled"
 ]);
 const TERMINAL_WORK_STATUSES = new Set(["completed", "failed", "cancelled"]);
+export const DEFINE_FRAMING_UNIT_ID = "socratic_problem_framing";
+const DEFINE_FRAMING_UNIT = {
+  id: DEFINE_FRAMING_UNIT_ID,
+  label: "Frame the problem with Socratic Asking",
+  status: "queued",
+  agentLabel: "socratic-asking"
+};
 const WORK_TRANSITIONS = {
   queued: new Set(["running", "failed", "cancelled"]),
   running: new Set(["waiting_user", "completed", "failed", "cancelled"]),
@@ -245,6 +252,16 @@ export async function createRun(rootInput, input) {
 
   const runs = await loadCollection(project.rootPath, "runs", "runs");
   const now = timestamp();
+  const units = normalizeUnits(input.units);
+  if (input.stage === "define") {
+    for (const unit of units) unit.status = "queued";
+    const framingIndex = units.findIndex((unit) => unit.id === DEFINE_FRAMING_UNIT_ID);
+    if (framingIndex === -1) units.unshift({ ...DEFINE_FRAMING_UNIT });
+    else {
+      const [framing] = units.splice(framingIndex, 1);
+      units.unshift({ ...framing, ...DEFINE_FRAMING_UNIT });
+    }
+  }
   const run = {
     id: randomUUID(),
     ...(input.actionId ? { actionId: input.actionId } : {}),
@@ -252,7 +269,7 @@ export async function createRun(rootInput, input) {
     status: "queued",
     title: requiredText(input.title, "Run title", 200),
     inputItemIds,
-    units: normalizeUnits(input.units),
+    units,
     createdAt: now,
     updatedAt: now
   };
@@ -282,6 +299,13 @@ export async function updateRun(rootInput, runId, patch = {}) {
   if (!run) throw new AsterismError("RUN_NOT_FOUND", `Run not found: ${runId}`);
 
   if (patch.status !== undefined) {
+    const framing = run.units.find((unit) => unit.id === DEFINE_FRAMING_UNIT_ID);
+    if (run.stage === "define" && patch.status === "completed" && framing?.status !== "completed") {
+      throw new AsterismError(
+        "PROBLEM_FRAMING_REQUIRED",
+        "A Define run cannot complete before Socratic problem framing is completed."
+      );
+    }
     assertWorkTransition(run.status, patch.status, "Run status");
     run.status = patch.status;
   }
@@ -295,6 +319,19 @@ export async function updateRun(rootInput, runId, patch = {}) {
       : undefined;
     if (incoming.id && !unit) {
       throw new AsterismError("WORK_UNIT_NOT_FOUND", `Work unit not found: ${incoming.id}`);
+    }
+    const framing = run.units.find((candidate) => candidate.id === DEFINE_FRAMING_UNIT_ID);
+    const startsWork = incoming.status !== undefined && incoming.status !== "queued";
+    if (
+      run.stage === "define" &&
+      unit?.id !== DEFINE_FRAMING_UNIT_ID &&
+      startsWork &&
+      framing?.status !== "completed"
+    ) {
+      throw new AsterismError(
+        "PROBLEM_FRAMING_REQUIRED",
+        "Complete Socratic problem framing before starting later Define work."
+      );
     }
     if (!unit) {
       unit = normalizeUnits([incoming])[0];
@@ -362,6 +399,13 @@ export async function registerArtifact(rootInput, input) {
   if (!run) throw new AsterismError("RUN_NOT_FOUND", `Run not found: ${input.runId}`);
   if (run.stage !== input.stage) {
     throw new AsterismError("INVALID_ARTIFACT_STAGE", "Artifact stage must match its run stage.");
+  }
+  const framing = run.units.find((unit) => unit.id === DEFINE_FRAMING_UNIT_ID);
+  if (run.stage === "define" && framing?.status !== "completed") {
+    throw new AsterismError(
+      "PROBLEM_FRAMING_REQUIRED",
+      "Complete Socratic problem framing before registering a Define artifact."
+    );
   }
   const sourceItemIds = normalizeIds(input.sourceItemIds, "Source item IDs");
   const board = await readJson(collectionPath(project.rootPath, "board"));
