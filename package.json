@@ -1,0 +1,16 @@
+{
+  "name": "asterism",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Local-first Codex context board spike",
+  "scripts": {
+    "start": "node src/local-service.mjs",
+    "mcp": "node src/mcp-server.mjs",
+    "spike": "node scripts/verify-spike.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

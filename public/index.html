@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asterism</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Local context workspace</p>
+          <h1>Asterism</h1>
+        </div>
+        <div class="status" id="service-status"><span></span> Connecting</div>
+      </header>
+
+      <section class="identity">
+        <div>
+          <p class="label">Project</p>
+          <strong id="project-name">Waiting for explicit initialization</strong>
+          <p id="project-root">Use <code>$asterism</code> in Codex to enable this folder.</p>
+        </div>
+        <div class="project-id">
+          <p class="label">Project ID</p>
+          <code id="project-id">—</code>
+        </div>
+        <button id="refresh-button" type="button">Refresh</button>
+        <button id="scan-button" type="button" disabled>Scan files</button>
+      </section>
+
+      <section class="inbox-panel">
+        <div>
+          <p class="label">Inbox</p>
+          <h2>Unsorted material</h2>
+        </div>
+        <span id="inbox-count">0 files</span>
+        <div class="inbox-list" id="inbox-list"></div>
+      </section>
+
+      <section class="board" aria-label="Asterism board">
+        <article data-section="reference">
+          <p class="index">01</p><h2>Reference</h2><p>External evidence and source material.</p>
+          <form class="link-form" data-link-section="reference">
+            <input class="link-title" name="title" type="text" autocomplete="off" maxlength="200" aria-label="Title for the Reference link" placeholder="Title (optional)" />
+            <input type="url" inputmode="url" autocomplete="off" aria-label="Paste a link into Reference" placeholder="Paste a Notion or web link" required />
+            <button type="submit">Add link</button>
+            <p class="link-feedback" aria-live="polite"></p>
+          </form>
+          <div class="cards" id="reference-list"></div>
+        </article>
+        <article data-section="context">
+          <p class="index">02</p><h2>Context</h2><p>Project facts, constraints, and decisions.</p>
+          <form class="link-form" data-link-section="context">
+            <input class="link-title" name="title" type="text" autocomplete="off" maxlength="200" aria-label="Title for the Context link" placeholder="Title (optional)" />
+            <input type="url" inputmode="url" autocomplete="off" aria-label="Paste a link into Context" placeholder="Paste a Notion or web link" required />
+            <button type="submit">Add link</button>
+            <p class="link-feedback" aria-live="polite"></p>
+          </form>
+          <div class="cards" id="context-list"></div>
+        </article>
+        <article data-section="define">
+          <p class="index">03</p><h2>Define</h2><p>Request → clarification → active goal.</p>
+          <div class="define-content" id="define-content" aria-live="polite"></div>
+        </article>
+        <article data-section="solutions">
+          <p class="index">04</p><h2>Solutions</h2><p>Goal → generation → local artifacts.</p>
+          <div class="empty-state">Active Goal required</div>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
